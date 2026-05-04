@@ -53,7 +53,7 @@ public CorsConfigurationSource corsConfigurationSource() {
 
     config.setAllowedOrigins(List.of(
         "http://localhost:3000",
-        "https://your-frontend.onrender.com" // 👈 thêm domain frontend
+        "https://clinic-frontend-e452.vercel.app" // 👈 thêm domain frontend
     ));
 
     config.setAllowedMethods(List.of(

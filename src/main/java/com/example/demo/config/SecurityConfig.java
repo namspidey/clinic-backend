@@ -38,7 +38,8 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/doctors/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/doctors/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/bookings/doctor/*/slots").permitAll() 
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
@@ -46,28 +47,26 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "https://clinic-frontend-e452.vercel.app" 
+        ));
+
+        config.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" 
+        ));
+
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config); 
+
+        return source;
+    }
     
-@Bean
-public CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration config = new CorsConfiguration();
-
-    config.setAllowedOrigins(List.of(
-        "http://localhost:3000",
-        "https://clinic-frontend-e452.vercel.app" // 👈 thêm domain frontend
-    ));
-
-    config.setAllowedMethods(List.of(
-        "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" // 👈 thêm OPTIONS
-    ));
-
-    config.setAllowedHeaders(List.of("*"));
-    config.setAllowCredentials(true);
-
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config); // 👈 đổi từ /api/** → /**
-
-    return source;
-}
-    // Và thêm .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-    // vào filterChain() trước .csrf()
 }
